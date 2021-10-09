@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Catalog.Infrastructure.Database;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Catalog.API.Controllers
@@ -9,11 +10,18 @@ namespace Catalog.API.Controllers
     [Route("api/[controller]")]
     public class ValuesController : ControllerBase
     {
+        private readonly TestContext _context;
+
+        public ValuesController(TestContext context)
+        {
+            _context = context;
+        }
+
         // GET api/values
         [HttpGet]
         public IEnumerable<string> Get()
         {
-            return new string[] { "value1", "value2" };
+            return _context.TestData.Select(x => x.TestVal1).ToList();
         }
 
         // GET api/values/5
@@ -27,6 +35,13 @@ namespace Catalog.API.Controllers
         [HttpPost]
         public void Post([FromBody]string value)
         {
+            _context.TestData.Add(new Infrastructure.Database.Models.TestDbModel()
+            {
+                TestVal1 = value,
+                TestVal2 = ""
+            });
+
+            _context.SaveChanges();
         }
 
         // PUT api/values/5
